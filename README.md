@@ -1,1 +1,1 @@
-# k8s-experiments
+# K8S experiments & playground
