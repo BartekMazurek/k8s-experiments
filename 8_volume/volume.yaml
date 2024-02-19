@@ -1,0 +1,45 @@
+AapiVersion: v1
+kind: PersistentVolume
+metadata:
+    name: pv01
+spec:
+    accessModes:
+        - ReadWriteOnce
+    capacity:
+        storage: 256Mi
+    persistentVolumeReclaimPolicy: Retain
+    storageClassName: "host-path"
+    hostPath:
+        path: /data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: pvc01
+spec:
+    accessModes:
+        - ReadWriteOnce
+    resources:
+        requests:
+            storage: 256Mi
+    storageClassName: "host-path"
+    volumeName: pv01
+---
+apiVersion: v1
+kind: Pod
+metadata:
+    name: ubuntu-pod
+spec:
+    volumes:
+        -   name: data
+            persistentVolumeClaim:
+                claimName: pvc01
+    containers:
+        - name: ubuntu-container
+          image: ubuntu:latest
+          command: ["/bin/bash", "-c"]
+          args:
+              - apt-get update && apt-get install -y curl && mkdir -p /home/data && /bin/sleep infinity
+          volumeMounts:
+              -   mountPath: /home/data
+                  name: data
